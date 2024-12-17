@@ -7,34 +7,36 @@
        
         if (isset($_POST['submit'])) {
             $company = $_POST['company'];
-            echo "company = ".$company;
+            // echo "company = ".$company;
 
             $date = $_POST['date']; 
-            echo "date = ".$date;
+            // echo "date = ".$date;
 
             $name = $_POST['name']; 
-            echo "name = ".$name;
+            // echo "name = ".$name;
 
             $quan = $_POST['quan']; 
-            echo "quan = ".$quan;
+            // echo "quan = ".$quan;
 
             $code = $_POST['code']; 
-            echo "code = ".$code;
+            // echo "code = ".$code;
 
-            $course = $_POST['course']; 
-            echo "course = ".$course;
+            // $course = $_POST['course']; 
+            // echo "course = ".$course;
 
             $session = $_POST['session'];
-            echo "session = ".$session;
+            // echo "session = ".$session;
 
             $price = $_POST['price'];
-            echo "price = ".$price;
+            // echo "price = ".$price;
 
             $tname = $_POST['tname']; 
-            echo "tname = ".$tname;
+            // echo "tname = ".$tname;
+
+            $status = '1' ;
             
-            $pb = $db->prepare("INSERT INTO `savedata`(`com_name`, `date`, `name`, `quantity`, `code`, `course`, `session`, `price`, `teacher_name`) VALUES 
-                                                    ('$company','$date','$name',$quan,'$code','$course','$session',$price,'$tname')");
+            $pb = $db->prepare("INSERT INTO `savedata`(`com_name`, `date`, `name`, `quantity`, `code`, `session`, `price`, `teacher_name`, `status`) VALUES 
+                                                    ('$company','$date','$name',$quan,'$code','$session',$price,'$tname','$status')");
             $pb->execute();
 
             if ($pb) {

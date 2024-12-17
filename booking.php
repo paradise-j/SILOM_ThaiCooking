@@ -5,18 +5,28 @@
   require_once 'connect.php';
 
 
-    if (isset($_GET['delete'])) {
-        $delete_id = $_GET['delete'];
-        $deletestmt = $db->query("DELETE FROM `savedata` WHERE `id` = '$delete_id'");
-        $deletestmt->execute();
+    if (isset($_GET['change'])) {
+        $change_id = $_GET['change'];
+        $cc = $db->query("SELECT `status` FROM `savedata` WHERE `id` ='$change_id'");
+        $cc->execute();
+        $cckk = $cc->fetch(PDO::FETCH_ASSOC);
+        extract($cckk);
+
+        if ($cckk == '1') {
+            $changestmt = $db->query("UPDATE `savedata` SET `status`= '2' WHERE `id` =  '$change_id'");
+            $changestmt->execute();
+        } else {
+            $changestmt = $db->query("UPDATE `savedata` SET `status`= '1' WHERE `id` =  '$change_id'");
+            $changestmt->execute();
+        }
         
-        if ($deletestmt) {
+        if ($changestmt) {
             // echo "<script>alert('Data has been deleted successfully');</script>";
             echo "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'สำเร็จ',
-                        text: 'ลบข้อมูลเรียบร้อยแล้ว',
+                        title: 'Successfully',
+                        text: 'Status changed successfully',
                         icon: 'success',
                         timer: 5000,
                         showConfirmButton: false
@@ -43,7 +53,7 @@
     <!-- Custom fonts for this template -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        href="https://fonts.googleapis.com/css?family=Kanit:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
     <!-- Custom styles for this template -->
@@ -99,23 +109,6 @@
                             <input id="defaultInput" class="form-control" type="text" style="border-radius: 30px;" name="code" required>
                         </div>
                         <div class="mb-1">
-                            <label for="" class="col-form-label">Course</label>
-                            <select class="form-control" aria-label="Default select example" id="course" name="course" style="border-radius: 30px;" required>
-                                <option selected disabled>please choose.......</option>
-                                <?php 
-                                    $stmt = $db->query("SELECT * FROM `course`");
-                                    $stmt->execute();
-                                    $cous = $stmt->fetchAll();
-                                    
-                                    foreach($cous as $cou){
-                                ?>
-                                <option value="<?= $cou['course_name']?>"><?= $cou['course_name']?></option>
-                                <?php
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="mb-1">
                             <label for="" class="col-form-label">Session</label>
                             <select class="form-control" aria-label="Default select example" id="session" name="session" style="border-radius: 30px;" required>
                                 <option selected disabled>please choose.......</option>
@@ -127,7 +120,7 @@
                         </div>
                         <div class="mb-1">
                             <label for="defaultInput" class="form-label">Price</label>
-                            <input id="defaultInput" class="form-control" type="number" min="1" style="border-radius: 30px;" name="price" required>  
+                            <input id="defaultInput" class="form-control" type="number" min="0" style="border-radius: 30px;" name="price" required>  
                         </div>
                         <div class="mb-1">
                             <label for="defaultInput" class="form-label">Teacher's name</label>
@@ -162,18 +155,17 @@
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
-                                    <tr>
-                                        
+                                    <tr align="center" style="font-size: .9rem;" >
                                         <th>Datetime</th>
                                         <th>Company name</th>
                                         <th>Name</th>
                                         <th>Quantity</th>
                                         <th>Code</th>
-                                        <th>Course</th>
                                         <th>Session</th>
                                         <th>Price</th>
                                         <th>Teacher's name</th>
-                                        <th></th>
+                                        <th>Status</th>
+                                        <!-- <th></th> -->
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -189,20 +181,33 @@
                                         ?>
                                         <tr align="center">
                                             
-                                            <td><?= $int['date']; ?></td>
-                                            <td><?= $int['com_name']; ?></td>
-                                            <td><?= $int['name']; ?></td>
-                                            <td><?= $int['quantity']; ?></td>
-                                            <td><?= $int['code']; ?></td>
-                                            <td><?= $int['course']; ?></td>
-                                            <td><?= $int['session']; ?></td>
-                                            <td><?= $int['price']; ?></td>
-                                            <td><?= $int['teacher_name']; ?></td>
-                                            <td align="center">
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['date']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['com_name']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['name']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['quantity']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['code']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['session']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['price']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;"><?= $int['teacher_name']; ?></td>
+                                            <td align="center" style="font-size: .9rem; vertical-align: middle;">
+                                                <?php
+                                                    if ($int['status'] == '1') {
+                                                ?>
+                                                        <a data-id="<?= $int['id']; ?>" href="?ChangeStatus=<?= $int['id']; ?>" class="btn btn-success badge change-btn">&nbsp&nbspconfirm&nbsp&nbsp</a>
+                                                <?php
+                                                    }else{
+                                                ?>
+                                                        <a data-id="<?= $int['id']; ?>" href="?ChangeStatus=<?= $int['id']; ?>" class="btn btn-danger badge change-btn">&nbsp&nbspcancel&nbsp&nbsp</a> 
+                                                <?php   
+                                                    }
+                                                ?>
+                                                
+                                            </td>
+                                            <!-- <td align="center"> -->
                                                 <!-- <button class="btn btn-warning" style="border-radius: 30px; font-size: 0.9rem;" data-toggle="modal" data-target="#editGroupModal<?= $int['id']?>">แก้ไข</button> -->
                                                 <!-- <a href="Edit_int.php?edit_id=<?= $int['id']; ?>" class="btn btn-warning " style="border-radius: 30px; font-size: 0.9rem;" name="edit"  data-toggle="modal" data-target="#editdataModal<?= $int['id']?>">แก้ไข</a> -->
-                                                <a data-id="<?= $int['id']; ?>" href="?delete=<?= $int['id']; ?>" class="btn btn-danger delete-btn" style="border-radius: 30px; font-size: 0.9rem;">ลบ</a>
-                                            </td>
+                                                <!-- <a data-id="<?= $int['id']; ?>" href="?delete=<?= $int['id']; ?>" class="btn btn-danger delete-btn" style="border-radius: 30px; font-size: 0.9rem;">ลบ</a> -->
+                                            <!-- </td> -->
                                         </tr>
                                         <?php
                                                 }      
@@ -214,28 +219,14 @@
                     </div>
 
                 </div>
-                <!-- /.container-fluid -->
-
             </div>
-            <!-- End of Main Content -->
 
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
+            <?php include('footer.php');?>
 
         </div>
-        <!-- End of Content Wrapper -->
 
     </div>
-    <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
@@ -279,32 +270,32 @@
 
     <script>
 
-    $(".delete-btn").click(function(e) {
+    $(".change-btn").click(function(e) {
         var userId = $(this).data('id');
         e.preventDefault();
-        deleteConfirm(userId);
+        changeConfirm(userId);
     })
 
-    function deleteConfirm(userId) {
+    function changeConfirm(userId) {
         Swal.fire({
-            title: 'ลบข้อมูล',
-            text: "คุณแน่ใจใช่หรือไม่ที่จบลบข้อมูลนี้",
+            title: 'Change Status',
+            text: "Are you sure you want to change this status?",
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'ลบข้อมูล',
+            confirmButtonText: 'Change Status',
             showLoaderOnConfirm: true,
             preConfirm: function() {
                 return new Promise(function(resolve) {
                     $.ajax({
                             url: 'booking.php',
                             type: 'GET',
-                            data: 'delete=' + userId,
+                            data: 'change=' + userId,
                         })
                         .done(function() {
                             Swal.fire({
-                                title: 'สำเร็จ',
-                                text: 'ลบข้อมูลเรียบร้อยแล้ว',
+                                title: 'Success',
+                                text: 'Status changed successfully',
                                 icon: 'success',
                             }).then(() => {
                                 document.location.href = 'booking.php';
@@ -312,8 +303,8 @@
                         })
                         .fail(function() {
                             Swal.fire({
-                                title: 'ไม่สำเร็จ',
-                                text: 'ลบข้อมูลไม่สำเร็จ',
+                                title: 'Unsuccess',
+                                text: 'Status Changed Unsuccessfully',
                                 icon: 'danger',
                             })
                             window.location.reload();
